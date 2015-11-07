@@ -15,7 +15,7 @@ def is_game_over_connectfour(board):
     if board.count_pieces() == FULL_BOARD:
         return True
     for chain in board.get_all_chains():
-        if len(chain) == FULL_CHAIN:
+        if len(chain) >= FULL_CHAIN:
             return True
     return False
 
