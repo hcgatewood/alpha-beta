@@ -8,9 +8,8 @@ NUM_COLUMNS = 7
 FULL_BOARD = NUM_ROWS * NUM_COLUMNS
 FULL_CHAIN = 4
 
-verb = False
 
-def is_game_over_connectfour(board) :
+def is_game_over_connectfour(board):
     "Returns True if game is over, otherwise False."
     # If the board is totally full
     if board.count_pieces() == FULL_BOARD:
@@ -20,7 +19,8 @@ def is_game_over_connectfour(board) :
             return True
     return False
 
-def next_boards_connectfour(board) :
+
+def next_boards_connectfour(board):
     """Returns a list of ConnectFourBoard objects that could result from the
     next move, or an empty list if no moves can be made."""
     new_boards = []
@@ -31,7 +31,8 @@ def next_boards_connectfour(board) :
             new_boards.append(board.add_piece(column))
     return new_boards
 
-def endgame_score_connectfour(board, is_current_player_maximizer) :
+
+def endgame_score_connectfour(board, is_current_player_maximizer):
     """Given an endgame board, returns 1000 if the maximizer has won,
     -1000 if the minimizer has won, or 0 in case of a tie."""
     # If the current player is the maximizer, which => minimizer won
@@ -40,7 +41,8 @@ def endgame_score_connectfour(board, is_current_player_maximizer) :
     # Else, the current player is the minimizer, which => maximizer won
     return 1000
 
-def endgame_score_connectfour_faster(board, is_current_player_maximizer) :
+
+def endgame_score_connectfour_faster(board, is_current_player_maximizer):
     """Given an endgame board, returns an endgame score with abs(score) >= 1000,
     returning larger absolute scores for winning sooner."""
     subtr_per_piece = 24
@@ -50,7 +52,8 @@ def endgame_score_connectfour_faster(board, is_current_player_maximizer) :
         return -score
     return score
 
-def heuristic_connectfour(board, is_current_player_maximizer) :
+
+def heuristic_connectfour(board, is_current_player_maximizer):
     """Given a non-endgame board, returns a heuristic score with
     abs(score) < 1000, where higher numbers indicate that the board is better
     for the maximizer."""
@@ -69,33 +72,35 @@ def heuristic_connectfour(board, is_current_player_maximizer) :
     return score_other_player - score_current_player
 
 
-# Now we can create AbstractGameState objects for Connect Four, using some of
-# the functions you implemented above.  You can use the following examples to
-# test your dfs and minimax implementations in Part 2.
+# This AbstractGameState represents a new ConnectFourBoard, before the
+# game has started:
+state_starting_connectfour = AbstractGameState(
+    snapshot=ConnectFourBoard(),
+    is_game_over_fn=is_game_over_connectfour,
+    generate_next_states_fn=next_boards_connectfour,
+    endgame_score_fn=endgame_score_connectfour_faster)
 
-# This AbstractGameState represents a new ConnectFourBoard, before the game has started:
-state_starting_connectfour = AbstractGameState(snapshot = ConnectFourBoard(),
-                                 is_game_over_fn = is_game_over_connectfour,
-                                 generate_next_states_fn = next_boards_connectfour,
-                                 endgame_score_fn = endgame_score_connectfour_faster)
+# This AbstractGameState represents the ConnectFourBoard "NEARLY_OVER"
+# from boards.py:
+state_NEARLY_OVER = AbstractGameState(
+    snapshot=NEARLY_OVER,
+    is_game_over_fn=is_game_over_connectfour,
+    generate_next_states_fn=next_boards_connectfour,
+    endgame_score_fn=endgame_score_connectfour_faster)
 
-# This AbstractGameState represents the ConnectFourBoard "NEARLY_OVER" from boards.py:
-state_NEARLY_OVER = AbstractGameState(snapshot = NEARLY_OVER,
-                                 is_game_over_fn = is_game_over_connectfour,
-                                 generate_next_states_fn = next_boards_connectfour,
-                                 endgame_score_fn = endgame_score_connectfour_faster)
-
-# This AbstractGameState represents the ConnectFourBoard "BOARD_UHOH" from boards.py:
-state_UHOH = AbstractGameState(snapshot = BOARD_UHOH,
-                                 is_game_over_fn = is_game_over_connectfour,
-                                 generate_next_states_fn = next_boards_connectfour,
-                                 endgame_score_fn = endgame_score_connectfour_faster)
+# This AbstractGameState represents the ConnectFourBoard "BOARD_UHOH"
+# from boards.py:
+state_UHOH = AbstractGameState(
+    snapshot=BOARD_UHOH,
+    is_game_over_fn=is_game_over_connectfour,
+    generate_next_states_fn=next_boards_connectfour,
+    endgame_score_fn=endgame_score_connectfour_faster)
 
 
-#### PART 2 ###########################################
-# Note: Functions in Part 2 use the AbstractGameState API, not ConnectFourBoard.
+# PART 2 ###########################################
 
-def dfs_maximizing(state) :
+
+def dfs_maximizing(state):
     """Performs depth-first search to find path with highest endgame score.
     Returns a tuple containing:
      0. the best path (a list of AbstractGameState objects),
@@ -125,27 +130,19 @@ def dfs_maximizing(state) :
         state_chains.extend(next_state_chains)
 
     ret = (best[0], best[1], score_evals)
-    # pretty_print_dfs_type(ret)
     return ret
 
-def minimax_endgame_search(state, maximize=True, depth_limit=INF, heuristic_fn=always_zero):
+
+def minimax_endgame_search(
+        state, maximize=True, depth_limit=INF, heuristic_fn=always_zero):
     """Performs minimax search, searching all leaf nodes and statically
     evaluating all endgame scores.  Same return type as dfs_maximizing."""
     # Let's set a list [state_chain, mm score, mm chain,
     # dict of possible scores -> node chain, has_been_expanded_boolean, index of parent)
-    # print '\n@@@@@@@@@ ', maximize, '\n'
     origin = [[state], -INF, None, dict(), False, None]
     nodes = [origin]
     evals = 0
-    # n = 0
-    if verb: print '\n\n***', maximize, depth_limit, heuristic_fn
     while nodes:
-        if verb:
-            pprint(nodes)
-            print [el[0][-1].is_game_over() for el in nodes]
-            print '**********'
-        # print n
-        # n += 1
         node = nodes[-1]
         chain = node[0]
         score = node[1]
@@ -156,7 +153,7 @@ def minimax_endgame_search(state, maximize=True, depth_limit=INF, heuristic_fn=a
         # Decide whether the current player is the maximizer or not
         # If the depth is odd, then p1 is up, i.e. the maximize boolean
         depth = len(chain) - 1
-        current_player_is_maximizer = maximize if depth%2 == 0 else not maximize
+        current_player_is_maximizer = maximize if depth % 2 == 0 else not maximize
         current_state = chain[-1]
         # If the chain has reached an endgame, assign it a score
         if current_state.is_game_over():
@@ -195,13 +192,11 @@ def minimax_endgame_search(state, maximize=True, depth_limit=INF, heuristic_fn=a
         # then we can return its chain
         if len(nodes) == 1 and score != -INF:
             ret = (mm_chain, score, evals)
-            # print ret, '\n##########'
             return ret
         # Now, given we have a score assigned, we want to add this node's score
         # to it's parent's list of possible vals, then pop this node
         if score != -INF:
             # Set that node's possible scores with this node's score -> this node's chain
-            # print '***', index_of_parent, score
             nodes[index_of_parent][3][score] = mm_chain
             nodes.pop()
             continue
@@ -210,39 +205,22 @@ def minimax_endgame_search(state, maximize=True, depth_limit=INF, heuristic_fn=a
         for next_state in current_state.generate_next_states():
             child_node = [chain + [next_state], -INF, None, dict(), False, len(nodes)-1]
             child_nodes.append(child_node)
-        # child_nodes.reverse()
         node[4] = True
         nodes.extend(child_nodes)
 
 
-# Uncomment the line below to try your minimax_endgame_search on an
-# AbstractGameState representing the ConnectFourBoard "NEARLY_OVER" from boards.py:
-
-# pretty_print_dfs_type(dfs_maximizing(state_NEARLY_OVER))
-#pretty_print_dfs_type(minimax_endgame_search(state_NEARLY_OVER))
-
-
-def minimax_search(state, heuristic_fn=always_zero, depth_limit=INF, maximize=True):
+def minimax_search(
+        state, heuristic_fn=always_zero, depth_limit=INF, maximize=True):
     "Performs standard minimax search.  Same return type as dfs_maximizing."
     ret = minimax_endgame_search(
         state, maximize, depth_limit, heuristic_fn)
-    if verb:
-        print '\n'
-        pretty_print_dfs_type(ret)
-        print '\n'
     return ret
 
-# Uncomment the line below to try minimax_search with "BOARD_UHOH" and
-# depth_limit=1.  Try increasing the value of depth_limit to see what happens:
 
-if verb:
-    pretty_print_dfs_type(minimax_search(
-        state_UHOH, heuristic_fn=heuristic_connectfour, depth_limit=1))
-
-
-def minimax_search_alphabeta(state, alpha=-INF, beta=INF, heuristic_fn=always_zero,
-                             depth_limit=INF, maximize=True, current_depth=0):
-    "Performs minimax with alpha-beta pruning.  Same return type as dfs_maximizing."
+def minimax_search_alphabeta(
+    state, alpha=-INF, beta=INF, heuristic_fn=always_zero, depth_limit=INF,
+        maximize=True, current_depth=0):
+    """Performs minimax with alpha-beta pruning. Same return type as dfs_maximizing."""
     if state.is_game_over():
         score = state.get_endgame_score(maximize)
         return ([state], score, 1)
@@ -297,36 +275,21 @@ def minimax_search_alphabeta(state, alpha=-INF, beta=INF, heuristic_fn=always_ze
         # also the sum of the children's evals
         return ([state] + min_child_ret[0], min_child_ret[1], num_evals)
 
-# Uncomment the line below to try minimax_search_alphabeta with "BOARD_UHOH" and
-# depth_limit=4.  Compare with the number of evaluations from minimax_search for
-# different values of depth_limit.
-
-# pretty_print_dfs_type(
-    # minimax_search_alphabeta(state_UHOH, heuristic_fn=heuristic_connectfour, depth_limit=4))
-
 
 def progressive_deepening(state, heuristic_fn=always_zero, depth_limit=INF,
-                          maximize=True) :
+                          maximize=True):
     """Runs minimax with alpha-beta pruning. At each level, updates anytime_value
     with the tuple returned from minimax_search_alphabeta. Returns anytime_value."""
     # print '\n\n'
     anytime_value = AnytimeValue()   # TA Note: Use this to store values.
     for depth in range(1, depth_limit+1):
-        ret =  minimax_search_alphabeta(
+        ret = minimax_search_alphabeta(
             state, -INF, INF, heuristic_fn, depth, maximize, 0)
-        # print ret
-        # print '*****'
         anytime_value.set_value(ret)
     return anytime_value
 
-# Uncomment the line below to try progressive_deepening with "BOARD_UHOH" and
-# depth_limit=4.  Compare the total number of evaluations with the number of
-# evaluations from minimax_search or minimax_search_alphabeta.
 
-#progressive_deepening(state_UHOH, heuristic_fn=heuristic_connectfour, depth_limit=4).pretty_print()
-
-
-#### SURVEY ###################################################
+# SURVEY ###################################################
 
 NAME = 'Hunter Gatewood'
 COLLABORATORS = 'None'
@@ -338,17 +301,17 @@ SUGGESTIONS = 'I think giving a hint that it will be faster to code and more int
     'to use recursion would be a nice tip at the beginning of the lab.'
 
 
-###########################################################
-### Ignore everything below this line; for testing only ###
-###########################################################
+#########################################################
+# Ignore everything below this line; for testing only ###
+#########################################################
 
 # The following lines are used in the tester. DO NOT CHANGE!
 
-def wrapper_connectfour(board_array, players, whose_turn = None) :
-    board = ConnectFourBoard(board_array = board_array,
-                             players = players,
-                             whose_turn = whose_turn)
-    return AbstractGameState(snapshot = board,
-                             is_game_over_fn = is_game_over_connectfour,
-                             generate_next_states_fn = next_boards_connectfour,
-                             endgame_score_fn = endgame_score_connectfour_faster)
+
+def wrapper_connectfour(board_array, players, whose_turn=None):
+    board = ConnectFourBoard(
+        board_array=board_array, players=players, whose_turn=whose_turn)
+    returnAbstractGameState(
+        snapshot=board, is_game_over_fn=is_game_over_connectfour,
+        generate_next_states_fn=next_boards_connectfour,
+        endgame_score_fn=endgame_score_connectfour_faster)
