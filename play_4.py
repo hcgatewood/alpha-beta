@@ -7,11 +7,6 @@ QUIT = ['q', 'Q', 'quit', 'Quit', 'QUIT']
 YES = ['y', 'yes', 'Y', 'Yes', 'YES']
 NO = ['n', 'no', 'N', 'No', 'NO']
 
-'''
-TODO:
-    - stuff on paper to your right
-'''
-
 
 def new_state(snap=None):
     # This AbstractGameState represents a new ConnectFourBoard, before the game has started:
