@@ -9,7 +9,6 @@ NO = ['n', 'no', 'N', 'No', 'NO']
 
 
 def new_state(snap=None):
-    # This AbstractGameState represents a new ConnectFourBoard, before the game has started:
     board = ConnectFourBoard() if snap is None else snap
     state_starting_connectfour = AbstractGameState(
         snapshot=board,
