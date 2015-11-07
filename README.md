@@ -1,4 +1,4 @@
-# alpha-beta
+# Alpha-Beta
 For those who, after finishing 6.034 lab 3, realized they wanted so badly to play against their beautiful new creation: a wrapping of the alpha-beta search bot.
 
 
