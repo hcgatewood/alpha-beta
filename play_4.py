@@ -144,7 +144,7 @@ def say_hi():
     print "\nWelcome!"
     print "First, let's get your name"
     name = raw_input(">>> ")
-    print "\nOkay, now do you want to go first?"
+    print "\nOkay, do you want to go first?"
     first = None
     while first is None:
         inp = raw_input(">>> ")
@@ -156,7 +156,7 @@ def say_hi():
             print "Oops, please type either 'yes' or 'no'."
     print "\nAnd, finally, choose the depth limit for the bot's search"
     print "(Picking values larger than 4 or 5 could result in long wait-times,"
-    print " while picking 1 would make for a mostly-trivial game.)"
+    print " while picking 1 would make for a mostly-trivial game)"
     depth_limit = None
     while depth_limit is None:
         inp = raw_input(">>> ")
