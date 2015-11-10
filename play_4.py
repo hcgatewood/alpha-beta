@@ -167,6 +167,7 @@ def say_hi():
             depth_limit = None
             print "Oops, please give an integer value >= 1."
     print "\nCool. Type 'q' at any point to quit (or <Ctrl-c>)"
+    print "Let's play Connect 4!"
     print "\n\n"
     return name, first, depth_limit
 
